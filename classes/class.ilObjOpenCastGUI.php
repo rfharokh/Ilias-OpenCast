@@ -35,7 +35,7 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  *
  * @author            Fabian Schmid <fs@studer-raimann.ch>
  *
- * @version           1.0.00
+ * @version           1.0.0
  *
  * Integration into control structure:
  * - The GUI class is called by ilRepositoryGUI
