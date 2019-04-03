@@ -203,6 +203,7 @@ class xoctEventFormGUI extends ilPropertyFormGUI {
 		$this->addItem($te);
 
 		$te = new ilTextInputGUI($this->txt(self::F_PRESENTERS), self::F_PRESENTERS);
+		$te->setRequired(true);
 		$this->addItem($te);
 
 
@@ -336,6 +337,14 @@ class xoctEventFormGUI extends ilPropertyFormGUI {
 			self::F_END          => $end,
 //						self::F_ONLINE           => $this->object->getXoctEventAdditions()->getIsOnline(),
 		);
+
+		if( empty($array[self::F_PRESENTERS]) )
+		{
+			global $DIC;
+			$ilUser = $DIC['ilUser'];
+			$xoctUser = xoctUser::getInstance($ilUser);
+			$array[self::F_PRESENTERS] = $xoctUser->getFirstName() . " " . $xoctUser->getLastName();
+		}
 
 		$this->setValuesByArray($array);
 	}
