@@ -513,7 +513,7 @@ class xoctEventGUI extends xoctGUI {
                 $smilURLIdentifier = ($role !== xoctMedia::ROLE_PRESENTATION ? "_presenter" : "_presentation");
 
                 $streamingServerURL = xoctConf::getConfig(xoctConf::F_STREAMING_URL);
-
+// TODO: make smil-prefix configurable when smil can be published to ExternalAPI
                 $hlsURL = $streamingServerURL . "/smil:engage-player_" . $id . $smilURLIdentifier . ".smil/playlist.m3u8";
 
                 $dashURL = $streamingServerURL . "/smil:engage-player_" . $id . $smilURLIdentifier . ".smil/manifest_mpm4sav_mvlist.mpd";
