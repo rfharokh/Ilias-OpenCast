@@ -231,6 +231,7 @@ class xoctConfFormGUI extends ilPropertyFormGUI {
 		$this->addItem($cb);
 
 
+		// INTERNAL VIDEO PLAYER
 		$cb = new ilCheckboxInputGUI($this->parent_gui->txt(xoctConf::F_INTERNAL_VIDEO_PLAYER), xoctConf::F_INTERNAL_VIDEO_PLAYER);
 		$cb->setInfo($this->parent_gui->txt(xoctConf::F_INTERNAL_VIDEO_PLAYER . '_info'));
 		$this->addItem($cb);
@@ -244,6 +245,11 @@ class xoctConfFormGUI extends ilPropertyFormGUI {
 		$te->setInfo($this->parent_gui->txt(xoctConf::F_STREAMING_URL . '_info'));
 		$te->setRequired(true);
 		$cbs->addSubItem($te);
+
+		$cbs = new ilCheckboxInputGUI($this->parent_gui->txt(xoctConf::F_USE_HIGHLOWRESSEGMENTPREVIEWS), xoctConf::F_USE_HIGHLOWRESSEGMENTPREVIEWS);
+		$cbs->setInfo($this->parent_gui->txt(xoctConf::F_USE_HIGHLOWRESSEGMENTPREVIEWS . '_info'));
+		$cbs->setRequired(false);
+		$cb->addSubItem($cbs);
 
 
 		$cb = new ilCheckboxInputGUI($this->parent_gui->txt(xoctConf::F_USE_MODALS), xoctConf::F_USE_MODALS);
@@ -304,13 +310,6 @@ class xoctConfFormGUI extends ilPropertyFormGUI {
 		$ro = new ilRadioOption($this->parent_gui->txt(xoctConf::F_SCHEDULED_METADATA_EDITABLE . '_' . xoctConf::METADATA_EXCEPT_DATE_PLACE), xoctConf::METADATA_EXCEPT_DATE_PLACE);
 		$ri->addOption($ro);
 		$this->addItem($ri);
-
-
-		$cb = new ilCheckboxInputGUI($this->parent_gui->txt(xoctConf::F_USE_HIGHLOWRESSEGMENTPREVIEWS), xoctConf::F_USE_HIGHLOWRESSEGMENTPREVIEWS);
-		$cb->setInfo($this->parent_gui->txt(xoctConf::F_USE_HIGHLOWRESSEGMENTPREVIEWS . '_info'));
-		$cb->setRequired(false);
-		$this->addItem($cb);
-
 	}
 
 
@@ -514,6 +513,10 @@ class xoctConfFormGUI extends ilPropertyFormGUI {
 		$cb = new ilCheckboxInputGUI($this->parent_gui->txt(xoctConf::F_NO_METADATA), xoctConf::F_NO_METADATA);
 		$cb->setInfo($this->parent_gui->txt(xoctConf::F_NO_METADATA . '_info'));
 		$this->addItem($cb);
+
+		$te = new ilNumberInputGUI($this->parent_gui->txt(xoctConf::F_UPLOAD_CHUNK_SIZE), xoctConf::F_UPLOAD_CHUNK_SIZE);
+		$te->setInfo($this->parent_gui->txt(xoctConf::F_UPLOAD_CHUNK_SIZE . '_info'));
+		$this->addItem($te);
 	}
 }
 

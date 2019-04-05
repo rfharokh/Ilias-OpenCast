@@ -453,16 +453,16 @@ class xoctEventGUI extends xoctGUI {
 			$this->cancel();
 		}
 
-		$publication = $xoctEvent->getPublicationMetadataForUsage(xoctPublicationUsage::getUsage(xoctPublicationUsage::USAGE_PLAYER));
+		$publication_player = $xoctEvent->getFirstPublicationMetadataForUsage(xoctPublicationUsage::getUsage(xoctPublicationUsage::USAGE_PLAYER));
 
 		// Multi stream
-		$medias = array_values(array_filter($publication->getMedia(), function (xoctMedia $media) {
+		$medias = array_values(array_filter($publication_player->getMedia(), function (xoctMedia $media) {
 			return (strpos($media->getMediatype(), xoctMedia::MEDIA_TYPE_VIDEO) !== false
 				&& in_array(xoctPublicationUsage::USAGE_ENGAGE_STREAMING, $media->getTags()));
 		}));
 		if (count($medias) === 0) {
 			// Single stream
-			$medias = array_values(array_filter($publication->getMedia(), function (xoctMedia $media) {
+			$medias = array_values(array_filter($publication_player->getMedia(), function (xoctMedia $media) {
 				return (strpos($media->getMediatype(), xoctMedia::MEDIA_TYPE_VIDEO) !== false
 					&& in_array(xoctPublicationUsage::USAGE_ENGAGE_STREAMING, $media->getTags()));
 			}));
@@ -471,7 +471,7 @@ class xoctEventGUI extends xoctGUI {
 		/**
 		 * @var xoctAttachment[] $previews
 		 */
-		$previews = array_filter($publication->getAttachments(), function (xoctAttachment $attachment) {
+		$previews = array_filter($publication_player->getAttachments(), function (xoctAttachment $attachment) {
 			return (strpos($attachment->getFlavor(), '/player+preview') !== false);
 		});
 		$previews = array_reduce($previews, function (array &$previews, xoctAttachment $preview) {
@@ -547,7 +547,7 @@ class xoctEventGUI extends xoctGUI {
             else{
                 return [
                     "type" => xoctMedia::MEDIA_TYPE_VIDEO,
-                    "role" => ($role !== xoctMedia::ROLE_PRESENTATION ? self::ROLE_MASTER : self::ROLE_SLAVE),
+                    "content" => ($role !== xoctMedia::ROLE_PRESENTATION ? self::ROLE_MASTER : self::ROLE_SLAVE),
                     "sources" => [
                         "mp4" => [
                             [
@@ -567,8 +567,13 @@ class xoctEventGUI extends xoctGUI {
 		}, $medias);
 
 		$segmentFlavor = xoctPublicationUsage::find(xoctPublicationUsage::USAGE_SEGMENTS)->getFlavor();
+		$publication_usage_segments = xoctPublicationUsage::getUsage(xoctPublicationUsage::USAGE_SEGMENTS);
+		$attachments =
+			$publication_usage_segments->getMdType() == xoctPublicationUsage::MD_TYPE_PUBLICATION_ITSELF ?
+				$xoctEvent->getFirstPublicationMetadataForUsage($publication_usage_segments)->getAttachments() :
+				$xoctEvent->getPublicationMetadataForUsage($publication_usage_segments);
 
-		$segments = array_filter($publication->getAttachments(), function (xoctAttachment $attachment) use ( &$segmentFlavor)  {
+		$segments = array_filter($attachments, function (xoctAttachment $attachment) use ( &$segmentFlavor)  {
 			return strpos($attachment->getFlavor(), $segmentFlavor) !== FALSE;
 		});
 
@@ -671,7 +676,7 @@ class xoctEventGUI extends xoctGUI {
         $event_id = $_GET['event_id'];
         $mid = $_GET['mid'];
         $xoctEvent = xoctEvent::find($event_id);
-        $media = $xoctEvent->getPublicationMetadataForUsage(xoctPublicationUsage::getUsage(xoctPublicationUsage::USAGE_PLAYER))->getMedia();
+        $media = $xoctEvent->getFirstPublicationMetadataForUsage(xoctPublicationUsage::getUsage(xoctPublicationUsage::USAGE_PLAYER))->getMedia();
         foreach ($media as $medium) {
             if ($medium->getId() == $mid) {
                 $url = $medium->getUrl();
@@ -1044,30 +1049,6 @@ class xoctEventGUI extends xoctGUI {
 		$this->ctrl->redirect($this, self::CMD_SHOW_CONTENT);
 	}
 
-
-	/**
-	 *
-	 */
-	protected function editOwner() {
-		$xoctEventOwnerFormGUI = new xoctEventOwnerFormGUI($this, xoctEvent::find($_GET[self::IDENTIFIER]), $this->xoctOpenCast);
-		$xoctEventOwnerFormGUI->fillForm();
-		$this->tpl->setContent($xoctEventOwnerFormGUI->getHTML());
-	}
-
-
-	/**
-	 *
-	 */
-	protected function updateOwner() {
-		$xoctEventOwnerFormGUI = new xoctEventOwnerFormGUI($this, xoctEvent::find($_GET[self::IDENTIFIER]), $this->xoctOpenCast);
-		$xoctEventOwnerFormGUI->setValuesByPost();
-		if ($xoctEventOwnerFormGUI->saveObject()) {
-			ilUtil::sendSuccess($this->txt('msg_success'), true);
-			$this->ctrl->redirect($this, self::CMD_STANDARD);
-		}
-	}
-
-
 	/**
 	 * @return string
 	 */
@@ -1091,23 +1072,15 @@ class xoctEventGUI extends xoctGUI {
 	 */
 	protected function reportDate() {
 		if (ilObjOpenCastAccess::checkAction(ilObjOpenCastAccess::ACTION_REPORT_DATE_CHANGE)) {
-            $message = $_POST['message'];
-
-            $mail = new ilMail(ANONYMOUS_USER_ID);
-            $type = array('system');
-
-            $mail->setSaveInSentbox(false);
-            $mail->appendInstallationSignature(true);
-            $mail->sendMail(
-                xoctConf::getConfig(xoctConf::F_REPORT_DATE_EMAIL),
-                '',
-                '',
-                'ILIAS Opencast Plugin: neue Meldung «geplante Termine anpassen»',
-                $this->getDateReportMessage($message),
-                array(),
-                $type
-            );
-		}
+            $message = $this->getDateReportMessage($_POST['message']);
+            $subject = 'ILIAS Opencast Plugin: neue Meldung «geplante Termine anpassen»';
+            $report = new xoctReport();
+            $report->setType(xoctReport::TYPE_DATE)
+                ->setUserId($this->user->getId())
+                ->setSubject($subject)
+                ->setMessage($message)
+                ->create();
+        }
 		ilUtil::sendSuccess($this->pl->txt('msg_date_report_sent'), true);
 		$this->ctrl->redirect($this);
 	}
@@ -1117,25 +1090,17 @@ class xoctEventGUI extends xoctGUI {
 	 *
 	 */
 	protected function reportQuality() {
-		if (ilObjOpenCastAccess::checkAction(ilObjOpenCastAccess::ACTION_REPORT_QUALITY_PROBLEM)) {
-			$message = $_POST['message'];
-			$event_id = $_POST['event_id'];
-			$event = new xoctEvent($event_id);
+		$event = new xoctEvent($_POST['event_id']);
+		if (ilObjOpenCastAccess::checkAction(ilObjOpenCastAccess::ACTION_REPORT_QUALITY_PROBLEM, $event)) {
+            $message = $this->getQualityReportMessage($event, $_POST['message']);
+            $subject = 'ILIAS Opencast Plugin: neue Meldung «Qualitätsprobleme»';
 
-            $mail = new ilMail(ANONYMOUS_USER_ID);
-            $type = array('system');
-
-            $mail->setSaveInSentbox(false);
-            $mail->appendInstallationSignature(true);
-            $mail->sendMail(
-                xoctConf::getConfig(xoctConf::F_REPORT_QUALITY_EMAIL),
-                '',
-                '',
-                'ILIAS Opencast Plugin: neue Meldung «Qualitätsprobleme»',
-                $this->getQualityReportMessage($event, $message),
-                array(),
-                $type
-            );
+            $report = new xoctReport();
+            $report->setType(xoctReport::TYPE_QUALITY)
+                ->setUserId($this->user->getId())
+                ->setSubject($subject)
+                ->setMessage($message)
+                ->create();
 		}
 		ilUtil::sendSuccess($this->pl->txt('msg_quality_report_sent'), true);
 		$this->ctrl->redirect($this);
@@ -1149,6 +1114,7 @@ class xoctEventGUI extends xoctGUI {
     protected function getQualityReportMessage(xoctEvent $event, $message) {
         $link = ilLink::_getStaticLink($_GET['ref_id'], ilOpenCastPlugin::PLUGIN_ID,
             true);
+        $link = '<a href="' . $link . '">' . $link . '</a>';
         $series = xoctInternalAPI::getInstance()->series()->read($_GET['ref_id']);
         $crs_grp_role = ilObjOpenCast::_getCourseOrGroupRole();
 	    $mail_body =
@@ -1175,6 +1141,7 @@ class xoctEventGUI extends xoctGUI {
     protected function getDateReportMessage($message) {
         $link = ilLink::_getStaticLink($_GET['ref_id'], ilOpenCastPlugin::PLUGIN_ID,
             true);
+        $link = '<a href="' . $link . '">' . $link . '</a>';
         $series = xoctInternalAPI::getInstance()->series()->read($_GET['ref_id']);
         $mail_body =
             "Dies ist eine automatische Benachrichtigung des ILIAS Opencast Plugins <br><br>"
