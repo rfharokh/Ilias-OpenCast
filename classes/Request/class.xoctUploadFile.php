@@ -1,4 +1,7 @@
 <?php
+
+use srag\Plugins\Opencast\UI\Input\Plupload;
+
 /**
  * Class xoctUploadFile
  *
@@ -17,7 +20,7 @@ class xoctUploadFile {
 
 		$inst = new self();
 		$inst->setTitle($file['name']);
-		$inst->setFilePath($file['tmp_name']);
+		$inst->setTmpName($file['tmp_name']);
 		$inst->setFileSize($file['size']);
 		$inst->setPostVar($name);
 
@@ -29,9 +32,8 @@ class xoctUploadFile {
 	 * @return CURLFile
 	 */
 	public function getCURLFile() {
-		require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/OpenCast/classes/Event/Form/class.xoctFileUploadInputGUI.php');
-		$xoctPlupload = new xoctPlupload();
-		$CURLFile = new CURLFile($xoctPlupload->getTargetDir() . '/' . $this->getTitle());
+		$plupload = new Plupload();
+		$CURLFile = new CURLFile($plupload->getTargetDir() . '/' . $this->getTmpName());
 
 		return $CURLFile;
 	}
@@ -40,7 +42,7 @@ class xoctUploadFile {
 	/**
 	 * @var string
 	 */
-	protected $file_path = '';
+	protected $tmp_name = '';
 	/**
 	 * @var string
 	 */
@@ -62,16 +64,16 @@ class xoctUploadFile {
 	/**
 	 * @return string
 	 */
-	public function getFilePath() {
-		return $this->file_path;
+	public function getTmpName() {
+		return $this->tmp_name;
 	}
 
 
 	/**
-	 * @param string $file_path
+	 * @param string $tmp_name
 	 */
-	public function setFilePath($file_path) {
-		$this->file_path = $file_path;
+	public function setTmpName($tmp_name) {
+		$this->tmp_name = $tmp_name;
 	}
 
 
