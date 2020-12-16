@@ -79,6 +79,7 @@ class xoctCurl {
 
 		curl_setopt($ch, CURLOPT_URL, $this->getUrl());
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->getRequestType());
+	    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
 
 		$this->prepare($ch);
 
@@ -576,7 +577,7 @@ class xoctCurl {
 	protected function preparePost($ch) {
 		curl_getinfo($ch, CURLINFO_HEADER_OUT);
 		if (count($this->getFiles()) > 0) {
-			curl_getinfo($ch, CURLOPT_SAFE_UPLOAD, false);
+			curl_getinfo($ch, CURLOPT_SAFE_UPLOAD);
 			foreach ($this->getFiles() as $file) {
 				$this->addPostField($file->getPostVar(), $file->getCURLFile());
 			}

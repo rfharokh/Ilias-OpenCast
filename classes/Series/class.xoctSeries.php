@@ -39,14 +39,16 @@ class xoctSeries extends APIObject {
      * @throws xoctException
      */
     protected function afterObjectLoad() {
-		$data = json_decode(xoctRequest::root()->series($this->getIdentifier())->acl()->get());
-		$acls = array();
-		foreach ($data as $d) {
-			$p = new xoctAcl();
-			$p->loadFromStdClass($d);
-			$acls[] = $p;
-		}
-		$this->setAccessPolicies($acls);
+        if (empty($this->access_policies)) {
+            $data = json_decode(xoctRequest::root()->series($this->getIdentifier())->acl()->get());
+            $acls = array();
+            foreach ($data as $d) {
+                $p = new xoctAcl();
+                $p->loadFromStdClass($d);
+                $acls[] = $p;
+            }
+            $this->setAccessPolicies($acls);
+        }
 	}
 
 
@@ -342,7 +344,11 @@ class xoctSeries extends APIObject {
 			return $existing;
 		}
 		$return = array();
-		$data = (array) json_decode(xoctRequest::root()->series()->parameter('limit', 5000)->get(array( $user_string )));
+		try {
+            $data = (array) json_decode(xoctRequest::root()->series()->parameter('limit', 5000)->get(array($user_string )));
+        } catch (Exception $e) {
+		    return [];
+        }
 		foreach ($data as $d) {
 			$obj = new self();
 			try {

@@ -35,6 +35,7 @@ class Metadata extends APIObject
     const FLAVOR_PRESENTER_SEGMENT_PREVIEW_LOWRES = "presenter/segment+preview+lowres";
     const FLAVOR_PRESENTATION_SEGMENT_PREVIEW = "presentation/segment+preview";
     const FLAVOR_PRESENTER_SEGMENT_PREVIEW = "presenter/segment+preview";
+
     /**
      * @var string
      */
@@ -388,9 +389,23 @@ class MetadataField extends APIObject
     {
         $stdClass = new stdClass();
         $stdClass->id = $this->getId();
-        $stdClass->value = $this->getValue();
+
+        $value = $this->getValue();
+        if (is_string($value)) {
+            $value = $this->fixPercentCharacter($value);
+        }
+        $stdClass->value = $value;
 
         return $stdClass;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function __toXML() : string
+    {
+
     }
 }
 

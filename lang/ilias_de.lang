@@ -2,6 +2,8 @@ admin_export#:#Einstellungen exportieren
 admin_import#:#Einstellungen importieren
 common_actions#:#Aktionen
 config_activate_cache#:#Cache aktivieren
+config_annotation_token_security#:#Anmerkungs-Token-Sicherheit aktivieren
+config_annotation_token_security_info#:#Fügt die Kursreferenz und einen Sicherheitshash zum Annotationslink hinzugefügt.
 config_api_base#:#API-Basis-URL
 config_api_version#:#API-Version
 config_api_version_info#:#Format: vX.Y.Z - z.B.: v1.0.0
@@ -9,6 +11,8 @@ config_audio_allowed#:#Audio-Dateien
 config_cancel#:#Abbrechen
 config_create_scheduled_allowed#:#"Aufzeichnungstermin(e) planen" erlauben
 config_create_scheduled_allowed_info#:#Achtung: Das planen von Aufzeichnungsterminen ist erst ab Opencast API-Version 1.1.0 möglich.
+config_common_idp#:#Gemeinsamer IdP
+config_common_idp_info#:#Auswählen, falls ILIAS und Opencast den selben Identity Provider verwenden (z.B. Shibboleth oder LDAP). Dadurch können gewisse Rechteprüfungen genauer durchgeführt werden.
 config_oc_studio_allowed#:#Opencast Studio aktivieren
 config_oc_studio_allowed_info#:#Ermöglichen Sie Benutzern den Zugriff auf Opencast Studio von Ilias aus (Erfordert Opencast > 8.3)
 config_curl#:#cURL
@@ -16,9 +20,11 @@ config_curl_debug_level#:#Debug-Level
 config_curl_password#:#API-Passwort
 config_curl_username#:#API-Benutzername
 config_editor_link#:#Link zum Opencast-Video-Editor
-config_editor_link_info#:#Als Platzhalter kann &#123event_id} verwendet werden. Bsp: https://myopencast.com/external-url/events/&#123event_id}/editor
+config_editor_link_info#:#Link, welcher für die Aktion "Schneiden" verwendet wird. Als Platzhalter kann &#123event_id} verwendet werden. Default: https://[ihre-opencast-url.de]/admin-ng/index.html#!/events/events/&#123event_id}/tools/editor
 config_eula#:#Nutzungsvereinbarung
 config_events#:#Aufzeichnungen
+config_external_download_source#:#Externe Downloadquelle
+config_external_download_source_info#:#Aktivieren Sie diese Option im Falle einer externen Webseite, um die Downloads anzuzeigen
 config_series#:#Serien
 config_licenses#:#Lizenzen
 config_licenses_info#:#Neue Einträge auf neuer Zeile in der Form URL#Name hinzufügen
@@ -49,12 +55,22 @@ config_advanced#:#Erweitert
 config_security#:#Security
 config_security_info#:#Erhöht die Sicherheit mithilfe von Opencasts "Stream Security". Nur aktivieren, wenn Opencast dafür konfiguriert ist.
 config_sign_annotation_links#:#Annotationslink signieren
+config_sign_annotation_links_time#:#Gültigkeit in Sekunden
+config_sign_annotation_links_time_info#:#Wie lange der Link für Annotation gültig sein soll (0 entspricht Verwaltung durch Opencast).
+config_sign_annotation_links_with_ip#:#Für Client-IP signieren
 config_sign_player_links#:#Playerlink signieren
 config_sign_player_links_overwrite_default#:#Benutze Aufzeichnungsdauer als Dauer für die Gültigkeit der Signatur
 config_sign_player_links_additional_time_percent#:#Zusätzliche Zeit
 config_sign_player_links_additional_time_percent_info#:#Wieviel zusätzliche Zeit soll der Gültigkeit der Signatur in Prozent, abhängig von der Dauer, hinzugefügt werden?
+config_sign_player_links_with_ip#:#Für Client-IP signieren
 config_sign_download_links#:#Downloadlink signieren
+config_sign_download_links_info#:#Downloadlinks sind für den Benutzer nicht sichtbar, da der Download via ILIAS-Server getätigt wird.
+config_sign_download_links_time#:#Gültigkeit in Sekunden
+config_sign_download_links_time_info#:#Wie lange der Link für Download gültig sein soll (0 entspricht Verwaltung durch Opencast).
 config_sign_thumbnail_links#:#Thumbnaillink signieren
+config_sign_thumbnail_links_time#:#Gültigkeit in Sekunden
+config_sign_thumbnail_links_time_info#:#Wie lange der Link für Thumbnail gültig sein soll (0 entspricht Verwaltung durch Opencast).
+config_sign_thumbnail_links_with_ip#:#Für Client-IP signieren
 config_request_comb_lv#:#Request Kombinations Level
 config_request_comb_lv_info#:#Definiert die Zusammensetzung der Anfragen, mit welchen die Events von Opencast geholt werden (viele kleine/wenige grosse Anfragen). Dies hat keinen Einfluss auf die Funktionalität, beeinflusst jedoch die Performanz.
 config_groups#:#Opencast-Gruppen
@@ -135,6 +151,8 @@ config_presentation_node#:#URL Presentation Node
 config_presentation_node_info#:#Wird zum Holen des Live-Streams benötigt. Z.B.: https://presentation.opencast.meine-uni.de/
 config_enable_chat#:#Chat aktivieren
 config_enable_chat_info#:#Aktiviert einen on-screen Chat neben dem Live-Event. Diese Option muss zusätzlich in den Einstellungen eines Objektes aktiviert werden, um wirksam zu werden.
+config_ingest_upload#:#Upload via Ingest-Nodes
+config_ingest_upload_info#:#Wenn aktiv, wird der Upload über Ingest-Nodes statt über die External-API ausgeführt. Dadurch kann die Last auf dem Opencast-Server bei mehreren gleichzeitigen Uploads besser verteilt werden. Achtung: Dazu muss der REST-Endpunkt /ingest für den ILIAS-Server erreichbar und für den API-Benutzer zugänglich sein.
 event_add_new#:#Aufzeichnung hochladen
 event_annotate#:#Annotieren
 event_auto_publish#:#Automatisch publizieren
@@ -145,9 +163,9 @@ event_create#:#Aufzeichnung hochladen
 event_createScheduled#:#Aufzeichnungstermin(e) erstellen
 event_created#:#Erstellt
 event_creator#:#Ersteller
-event_cut#:#Aufzeichnung schneiden
+event_cut#:#Schneiden
 event_date#:#Datum
-event_delete#:#Aufzeichnung löschen
+event_delete#:#Löschen
 event_unpublish#:#Publikationen entfernen
 event_delete_confirm#:#Das Löschen bewirkt, dass die Aufzeichnung definitiv gelöscht wird (auch auf Opencast). Wollen Sie diese Aufzeichnung wirklich löschen?
 event_unpublish_confirm#:#Damit diese Aufzeichnung gelöscht werden kann, müssen erst alle Publikationen in Opencast entfernt werden. Wollen Sie die Publikationen wirklich entfernen?
@@ -190,6 +208,7 @@ event_presenters#:#Referent/in
 event_preview#:#Vorschau
 event_processing_state#:#Status
 event_recording_station#:#Aufnahmestation
+event_republish#:#Publizieren
 event_schedule_new#:#Aufzeichnungstermin(e) planen
 event_start_time#:#Start
 event_start#:#Start
@@ -243,6 +262,7 @@ owner_only_one_owner#:#Es kann nur ein Besitzer pro Video ausgewählt werden.
 invitations_back#:#Zurück
 invitations_header#:#Zugriffsrechte erteilen
 invitations_none_available#:#Keine verfügbar
+invitations_invite_all#:#Alle hinzufügen
 obj_xoct#:#Opencast
 objs_xoct#:#Opencast
 perm_upload#:#Upload
@@ -257,6 +277,7 @@ publication_usage_description#:#Beschreibung
 publication_usage_edit#:#Bearbeiten
 publication_usage_ext_id#:#Metadata-ID
 publication_usage_flavor#:#Flavor
+publication_usage_flavor_info#:#Hier kann auch nur nach dem ersten, bzw. zweiten Teil des Flavor gesucht werden, z.B. 'presentation/', bzw. '/delivery'.
 publication_usage_md_type#:#Typ
 publication_usage_md_type_0#:#Publikation
 publication_usage_md_type_1#:#Attachment
@@ -274,9 +295,18 @@ publication_usage_type_player#:#Player
 publication_usage_type_thumbnail#:#Vorschaubild
 publication_usage_update#:#Aktualisieren
 publication_usage_usage_id#:#Nutzung
+publication_usage_type_thumbnail_fallback_2#:#Thumbnail Fallback
 publication_usage_type_thumbnail_fallback_2#:#Thumbnail Fallback 2
 publication_usage_type_download#:#Download
+publication_usage_type_download_fallback#:#Download Fallback
+publication_usage_type_preview#:#Preview
 publication_usage_type_live_event#:#Live-Event
+publication_usage_type_unprotected_link#:#Ungeschützter Link
+publication_usage_search_key#:#Suchbegriff
+publication_usage_search_key_info#:#Die Medien/Attachments werden nach dem hier angegebenen Flavor/Tag durchsucht.
+publication_usage_tag#:#Tag
+publication_usage_allow_multiple#:#Mehrere Möglichkeiten zulassen
+publication_usage_allow_multiple_info#:#Wenn aktiviert und es werden mehrere Medien/Attachments mit dem oben angegebenen Flavor/Tag gefunden, werden diese alle zum Download angeboten.
 series_accept_eula#:#Ich akzeptiere die Nutzungsvereinbarungen
 series_alert_eula#:#Die Nutzungsvereinbarung muss akzeptiert werden
 series_cancel#:#Abbrechen
@@ -315,6 +345,7 @@ series_saved#:#Serie-Informationen gespeichert
 series_show_upload_token#:#Upload-Token anzeigen
 series_show_upload_token_info#:#Zeigt einen Code an, mit welchem Studierende selber Aufzeichnungen hochladen können
 series_streaming_only#:#Nur Streaming
+series_streaming_only_info#:#Entfernt 'Download'-Buttons.
 series_title#:#Titel
 series_update#:#Aktualisieren
 series_use_annotations#:#Annotationen aktivieren
@@ -445,3 +476,18 @@ tiles_per_page#:#Kacheln pro Seite:
 event_live_waiting_text#:#Das Live Event hat noch nicht begonnen.<br>Geplante Startzeit: %s
 event_live_interrupted_text#:#Das Live Event wurde unterbrochen oder frühzeitig beendet.
 event_live_over_text#:#Das Live Event wurde beendet.
+msg_workflows_info#:#Die hier konfigurierten Workflows können verwendet werden, um Events erneut zu publizieren.
+msg_workflow_created#:#Workflow erfolgreich erstellt.
+msg_workflow_updated#:#Workflow erfolgreich aktualisiert.
+config_button_add_workflow#:#Neuen Workflow hinzufügen
+workflow_table_title#:#Workflows
+tab_workflows#:#Workflows
+workflow#:#Workflow
+event_msg_republish_started#:#Workflow erfolgreich gestartet.
+workflow_msg_confirm_delete_workflow#:#Sind Sie sicher, dass folgender Workflow gelöscht werden soll?
+workflow_msg_workflow_deleted#:#Workflow erfolgreich gelöscht.
+parameters#:#Parameter
+parameters_info#:#Hier angegebene Workflow-Parameter werden mit dem Wert 'true' mitgeschickt (Parameter durch Komma trennen).
+unprotected_link#:#Ungeschützter Link
+msg_link_copied#:#Link kopiert
+tooltip_copy_link#:#Link in die Zwischenablage kopieren
